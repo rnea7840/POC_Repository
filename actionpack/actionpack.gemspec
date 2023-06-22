@@ -5,7 +5,7 @@ version = File.read(File.expand_path("../RAILS_VERSION", __dir__)).strip
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = "actionpack"
-  s.version     = version
+  s.version     = ">= 6.0.0"
   s.summary     = "Web-flow and rendering framework putting the VC in MVC (part of Rails)."
   s.description = "Web apps on Rails. Simple, battle-tested conventions for building and testing MVC web applications. Works with any Rack-compatible server."
 

@@ -33,13 +33,14 @@ Gem::Specification.new do |s|
   # NOTE: Please read our dependency guidelines before updating versions:
   # https://edgeguides.rubyonrails.org/security.html#dependency-management-and-cves
 
-  s.add_dependency "activesupport", version
+  s.add_dependency "activesupport", ">= 6.0.2.2"
+
 
   s.add_dependency "builder",       "~> 3.1"
   s.add_dependency "erubi",         "~> 1.4"
   s.add_dependency "rails-html-sanitizer", "~> 1.1", ">= 1.2.0"
   s.add_dependency "rails-dom-testing", "~> 2.0"
 
-  s.add_development_dependency "actionpack",  version
+  s.add_development_dependency "actionpack", ">= 6.0.0"
   s.add_development_dependency "activemodel", version
 end

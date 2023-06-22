@@ -24,15 +24,15 @@ module ActionView
       # responses, like:
       #
       #   $('some_element').replaceWith('<%= j render 'some/element_template' %>');
-      def escape_javascript(javascript)
-        javascript = javascript.to_s
-        if javascript.empty?
-          result = ""
+      def escape_javascript(input_string)
+        input_string = input_string.to_s
+        if input_string.empty?
+          escaped_string = ""
         else
-          result = javascript.gsub(/(\\|<\/|\r\n|\342\200\250|\342\200\251|[\n\r"']|[`]|[$])/u, JS_ESCAPE_MAP)
+          escaped_string = input_string.gsub(/(\\|<\/|\r\n|\342\200\250|\342\200\251|[\n\r"']|[`]|[$])/u, JS_ESCAPE_MAP)
         end
-        javascript.html_safe? ? result.html_safe : result
-      end
+        input_string.html_safe? ? escaped_string.html_safe : escaped_string
+      end      
 
       alias_method :j, :escape_javascript
 

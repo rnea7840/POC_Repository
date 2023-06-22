@@ -67,13 +67,14 @@ module ActionDispatch
           /\A#{host}#{PORT_REGEX}?\z/
         end
 
-        def sanitize_string(host)
-          if host.start_with?(".")
-            /\A([a-z0-9-]+\.)?#{Regexp.escape(host[1..-1])}#{PORT_REGEX}?\z/i
+        def sanitize_hostname(hostname)
+          if hostname.start_with?(".")
+            /\A([a-z0-9-]+\.)?#{Regexp.escape(hostname[1..-1])}#{PORT_REGEX}?\z/i
           else
-            /\A#{Regexp.escape host}#{PORT_REGEX}?\z/i
+            /\A#{Regexp.escape hostname}#{PORT_REGEX}?\z/i
           end
         end
+        
 
         def extract_hostname(host)
           host.slice(VALID_IP_HOSTNAME, "host") || host
@@ -119,34 +120,34 @@ module ActionDispatch
         end
     end
 
-    def initialize(app, hosts, exclude: nil, response_app: nil)
-      @app = app
-      @permissions = Permissions.new(hosts)
-      @exclude = exclude
-
-      @response_app = response_app || DefaultResponseApp.new
+    def initialize_middleware(application, host_list, exclude: nil, response_application: nil)
+      @application = application
+      @permissions = Permissions.new(host_list)
+      @exclusion = exclude
+    
+      @response_application = response_application || DefaultResponseApp.new
     end
-
-    def call(env)
-      return @app.call(env) if @permissions.empty?
-
-      request = Request.new(env)
-
-      if authorized?(request) || excluded?(request)
-        mark_as_authorized(request)
-        @app.call(env)
+    
+    def call(environment)
+      req = Request.new(environment)
+    
+      if authorized?(req) || excluded?(req)
+        mark_as_authorized(req)
+        @app.call(environment)
       else
-        @response_app.call(env)
+        @response_app.call(environment)
       end
-    end
-
+    
+      return @app.call(environment) if @permissions.empty?
+    end 
     private
-      def authorized?(request)
-        origin_host = request.get_header("HTTP_HOST")
-        forwarded_host = request.x_forwarded_host&.split(/,\s?/)&.last
-
-        @permissions.allows?(origin_host) && (forwarded_host.blank? || @permissions.allows?(forwarded_host))
+      def is_authorized?(req)
+       origin_hostname = req.get_header("HTTP_HOST")
+       forwarded_hostname = req.x_forwarded_host&.split(/,\s?/)&.last
+    
+       @permissions.allows?(origin_hostname) && (forwarded_hostname.blank? || @permissions.allows?(forwarded_hostname))
       end
+    
 
       def excluded?(request)
         @exclude && @exclude.call(request)
